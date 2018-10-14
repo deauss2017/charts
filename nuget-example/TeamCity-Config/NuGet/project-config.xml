@@ -117,7 +117,48 @@
       <cleanup />
     </settings>
   </build-type>
-  
+  <build-type id="btx5" name="MyLogger">
+    <description />
+    <settings>
+      <parameters />
+      <build-runners>
+        <runner id="RUNNER_8" name="" type="VS.Solution">
+          <parameters>
+            <param name="build-file-path" value="MyLogger\MyLogger.sln" />
+            <param name="msbuild.prop.Configuration" value="Release" />
+            <param name="msbuild_version" value="4.5" />
+            <param name="run-platform" value="x86" />
+            <param name="targets" value="Rebuild" />
+            <param name="teamcity.step.mode" value="default" />
+            <param name="toolsVersion" value="4.0" />
+            <param name="vs.version" value="vs2012" />
+          </parameters>
+        </runner>
+        <runner id="RUNNER_14" name="Pack as Artifact" type="jb.nuget.pack">
+          <parameters>
+            <param name="nuget.pack.output.clean" value="true" />
+            <param name="nuget.pack.output.directory" value="packages" />
+            <param name="nuget.pack.properties" value="Configuration=Release" />
+            <param name="nuget.pack.specFile" value="MyLogger\MyLogger\MyLogger.csproj" />
+            <param name="nuget.path" value="?NuGet.CommandLine.2.2.0.nupkg" />
+            <param name="nugetCustomPath" value="?NuGet.CommandLine.2.2.0.nupkg" />
+            <param name="nugetPathSelector" value="?NuGet.CommandLine.2.2.0.nupkg" />
+            <param name="teamcity.step.mode" value="default" />
+          </parameters>
+        </runner>
+        <runner id="RUNNER_3" name="" type="simpleRunner">
+          <parameters>
+            <param name="org.jfrog.artifactory.selectedDeployableServer.envVarsExcludePatterns" value="*password*,*secret*" />
+            <param name="org.jfrog.artifactory.selectedDeployableServer.publishBuildInfo" value="true" />
+            <param name="org.jfrog.artifactory.selectedDeployableServer.publishedArtifacts" value="packages/*.nupkg" />
+            <param name="org.jfrog.artifactory.selectedDeployableServer.targetRepo" value="nuget-local" />
+            <param name="org.jfrog.artifactory.selectedDeployableServer.urlId" value="0" />
+            <param name="script.content" value="echo off" />
+            <param name="teamcity.step.mode" value="default" />
+            <param name="use.custom.script" value="true" />
+          </parameters>
+        </runner>
+      </build-runners>
       <vcs-settings checkout-mode="ON_SERVER" labeling-type="NONE" labeling-pattern="build-%system.build.number%">
         <vcs-entry-ref root-id="5" set-label="false" />
       </vcs-settings>
