@@ -1,3 +1,3 @@
-FROM jfrogtraining-docker-dev.jfrog.io/hello-world:latest
+FROM openjdk:8-alpine
 MAINTAINER Stanley Fong stanleyf@jfrog.com
 CMD /bin/sh
