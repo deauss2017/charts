@@ -1,4 +1,4 @@
-FROM jfrogtraining-docker-dev.jfrog.io/docker-hello:97
+FROM openjdk:8-alpine
 
 MAINTAINER Stanley Fong  stanleyf@jfrog.com
 
