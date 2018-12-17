@@ -1,19 +1,62 @@
-# Maven
-# Build your Java project and run tests with Apache Maven.
-# Add steps that analyze code, save build artifacts, deploy, and more:
-# https://docs.microsoft.com/azure/devops/pipelines/languages/java
-
-pool:
-  vmImage: 'Ubuntu 16.04'
+resources:
+- repo: self
+queue:
+  name: Hosted Ubuntu 1604
+  demands: 
+  - java
+  - maven
 
 steps:
-- task: Maven@3
+- task: SonarSource.sonarqube.15B84CA1-B62F-4A2A-A403-89B77A063157.SonarQubePrepare@4
+  displayName: 'Prepare analysis on SonarQube'
+  inputs:
+    SonarQube: sonar
+
+    scannerMode: Other
+
+    extraProperties: |
+     # Additional properties that will be passed to the scanner, 
+     # Put one key=value per line, example:
+     # sonar.exclusions=**/*.bin
+     curlstr="curl -uadmin:${artAPI} \'${artiServerUrl}"
+     warverstr= curlstr +  "api/search/latestVersion?g=com.baozun.unex&a=unex-gateway&repos=demoapp-maven-dev-local&v=1.4*\'";
+     warVersion = ["bash","-c",warverstr].execute().text
+     getSonarIssuesCmd = "curl  GET -v http://10.11.122.38:9000/api/issues/search?componentRoots=${JOB_NAME}";
+
+
+- task: SonarSource.sonarqube.6D01813A-9589-4B15-8491-8164AEB38055.SonarQubeAnalyze@4
+  displayName: 'Run Code Analysis'
+
+
+- task: SonarSource.sonarqube.291ed61f-1ee4-45d3-b1b0-bf822d9095ef.SonarQubePublish@4
+  displayName: 'Publish Quality Gate Result'
+
+
+- task: JFrog.jfrog-artifactory-vsts-extension.artifactory-maven.ArtifactoryMaven@1
+  displayName: 'Artifactory Maven'
   inputs:
     mavenPomFile: 'maven-example/pom.xml'
-    mavenOptions: '-Xmx3072m'
-    javaHomeOption: 'JDKVersion'
-    jdkVersionOption: '1.10'
-    jdkArchitectureOption: 'x64'
-    publishJUnitResults: true
-    testResultsFiles: '**/TEST-*.xml'
-    goals: 'package'
+
+    artifactoryResolverService: artifactory
+
+    targetResolveReleaseRepo: 'maven-releases-virtual'
+
+    targetResolveSnapshotRepo: 'maven-snapshots-virtual'
+
+    artifactoryDeployService: artifactory
+
+    targetDeployReleaseRepo: 'huhu-release-local'
+
+    targetDeploySnapshotRepo: 'huhu-snapshot-local'
+
+    collectBuildInfo: true
+
+    includeEnvVars: true
+
+
+- task: JFrog.jfrog-artifactory-vsts-extension.artifactory-publish-build-info.ArtifactoryPublishBuildInfo@1
+  displayName: 'Artifactory Publish Build Info'
+  inputs:
+    artifactoryService: artifactory
+
+
